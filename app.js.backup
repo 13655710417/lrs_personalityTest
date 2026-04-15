@@ -1,0 +1,449 @@
+// Wolf Kill Personality Test App
+document.addEventListener('DOMContentLoaded', () => {
+    const app = document.getElementById('app');
+
+    // State
+    let currentView = 'home'; // 'home', 'test', 'result'
+    let currentQuestionIndex = 0;
+    let answers = []; // array of {questionId, optionIndex, scores}
+    let result = null;
+
+    // Render functions
+    function render() {
+        switch (currentView) {
+            case 'home':
+                renderHome();
+                break;
+            case 'test':
+                renderTest();
+                break;
+            case 'result':
+                renderResult();
+                break;
+        }
+    }
+
+    function renderHome() {
+        app.innerHTML = `
+            <div class="fade-in">
+                <header class="text-center mb-12">
+                    <h1 class="text-4xl md:text-5xl font-bold text-gray-800 mb-4">${frontendText.title}</h1>
+                    <p class="text-xl text-gray-600 mb-8">${frontendText.subtitle}</p>
+                    <div class="w-24 h-1 bg-blue-500 mx-auto mb-8"></div>
+                </header>
+
+                <div class="bg-white rounded-2xl shadow-xl p-8 md:p-12 mb-12 card-hover">
+                    <div class="flex flex-col md:flex-row items-center">
+                        <div class="md:w-2/3 mb-8 md:mb-0 md:pr-12">
+                            <h2 class="text-2xl font-bold text-gray-800 mb-4">测试说明</h2>
+                            <ul class="text-gray-700 space-y-3">
+                                <li class="flex items-start">
+                                    <i class="fas fa-check text-green-500 mt-1 mr-3"></i>
+                                    <span>本测试共 <span class="font-bold text-blue-600">${questions.length}</span> 道选择题，基于你在狼人杀游戏中的真实表现</span>
+                                </li>
+                                <li class="flex items-start">
+                                    <i class="fas fa-check text-green-500 mt-1 mr-3"></i>
+                                    <span>每题只选 <span class="font-bold text-blue-600">最符合你</span> 的选项，不要犹豫，凭直觉选择</span>
+                                </li>
+                                <li class="flex items-start">
+                                    <i class="fas fa-check text-green-500 mt-1 mr-3"></i>
+                                    <span>测试将从 <span class="font-bold text-blue-600">6个维度</span> 分析你的游戏人格</span>
+                                </li>
+                                <li class="flex items-start">
+                                    <i class="fas fa-check text-green-500 mt-1 mr-3"></i>
+                                    <span>完成测试后，将获得专属人格报告，并可以分享给好友</span>
+                                </li>
+                            </ul>
+                            <div class="mt-8">
+                                <h3 class="text-lg font-bold text-gray-800 mb-2">6个分析维度：</h3>
+                                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                                    ${dimensions.map(dim => `
+                                        <div class="bg-gray-50 p-3 rounded-lg">
+                                            <div class="font-medium text-gray-800">${dim.labels[0]} / ${dim.labels[2]}</div>
+                                            <div class="text-sm text-gray-600">${dim.key}</div>
+                                        </div>
+                                    `).join('')}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="md:w-1/3 text-center">
+                            <div class="bg-gradient-to-br from-blue-50 to-indigo-50 p-8 rounded-2xl border border-blue-100">
+                                <i class="fas fa-users text-6xl text-blue-500 mb-6"></i>
+                                <h3 class="text-xl font-bold text-gray-800 mb-4">立即开始测试</h3>
+                                <p class="text-gray-600 mb-6">只需3-5分钟，了解你在狼人杀中的真实人格</p>
+                                <button onclick="startTest()" class="btn bg-gradient-to-r from-blue-500 to-indigo-600 text-white font-bold py-4 px-8 rounded-full text-lg hover:from-blue-600 hover:to-indigo-700 focus:outline-none focus:ring-4 focus:ring-blue-300 transition-all w-full">
+                                    <i class="fas fa-play mr-2"></i>${frontendText.buttons.start}
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="text-center">
+                    <h3 class="text-2xl font-bold text-gray-800 mb-6">30种可能的人格结果</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4 mb-12">
+                        ${personalities.slice(0, 10).map(p => `
+                            <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
+                                <div class="font-bold text-gray-800">${p.name}</div>
+                                <div class="text-sm text-gray-600 mt-1 truncate">${p.description.split(' ')[0]}</div>
+                            </div>
+                        `).join('')}
+                    </div>
+                    <p class="text-gray-500">还有 ${personalities.length - 10} 种人格等你发现...</p>
+                </div>
+            </div>
+        `;
+    }
+
+    function renderTest() {
+        const question = questions[currentQuestionIndex];
+        const progress = ((currentQuestionIndex + 1) / questions.length) * 100;
+        const selectedAnswer = answers.find(a => a.questionId === question.id);
+
+        app.innerHTML = `
+            <div class="fade-in max-w-3xl mx-auto">
+                <div class="flex justify-between items-center mb-8">
+                    <button onclick="goHome()" class="text-gray-600 hover:text-gray-800 flex items-center">
+                        <i class="fas fa-arrow-left mr-2"></i>返回首页
+                    </button>
+                    <div class="text-gray-600">
+                        第 <span class="font-bold text-blue-600">${currentQuestionIndex + 1}</span> / ${questions.length} 题
+                    </div>
+                </div>
+
+                <div class="mb-8">
+                    <div class="progress-bar">
+                        <div class="progress-fill bg-gradient-to-r from-blue-400 to-indigo-500" style="width: ${progress}%"></div>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-2xl shadow-xl p-8 mb-8">
+                    <h2 class="text-2xl font-bold text-gray-800 mb-6">${question.text}</h2>
+
+                    <div class="space-y-4">
+                        ${question.options.map((option, idx) => {
+                            const isSelected = selectedAnswer && selectedAnswer.optionIndex === idx;
+                            return `
+                                <div class="option-item p-5 border-2 rounded-xl cursor-pointer transition-all ${isSelected ? 'option-selected border-blue-500 bg-blue-50' : 'border-gray-200 hover:border-blue-300 hover:bg-blue-50'}"
+                                     onclick="selectOption(${idx})">
+                                    <div class="flex items-start">
+                                        <div class="flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center ${isSelected ? 'bg-blue-500 text-white' : 'bg-gray-100 text-gray-700'} font-bold mr-4">
+                                            ${option.letter}
+                                        </div>
+                                        <div class="flex-grow">
+                                            <div class="font-medium text-gray-800 text-lg">${option.text}</div>
+                                            ${isSelected ? '<div class="mt-2 text-blue-600"><i class="fas fa-check-circle mr-2"></i>已选择</div>' : ''}
+                                        </div>
+                                    </div>
+                                </div>
+                            `;
+                        }).join('')}
+                    </div>
+                </div>
+
+                <div class="flex justify-between">
+                    <button onclick="prevQuestion()" class="btn bg-gray-200 text-gray-800 font-bold py-3 px-6 rounded-lg hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-400 transition-all ${currentQuestionIndex === 0 ? 'opacity-50 cursor-not-allowed' : ''}" ${currentQuestionIndex === 0 ? 'disabled' : ''}>
+                        <i class="fas fa-chevron-left mr-2"></i>上一题
+                    </button>
+
+                    <div class="text-center">
+                        ${selectedAnswer ? `
+                            <div class="text-green-600 mb-2">
+                                <i class="fas fa-check-circle mr-2"></i>已选择选项
+                            </div>
+                        ` : ''}
+                        <button onclick="nextQuestion()" class="btn ${selectedAnswer ? 'bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700' : 'bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700'} text-white font-bold py-3 px-8 rounded-lg focus:outline-none focus:ring-4 focus:ring-blue-300 transition-all">
+                            ${currentQuestionIndex === questions.length - 1 ? '查看结果' : '下一题'}
+                            <i class="fas fa-chevron-right ml-2"></i>
+                        </button>
+                    </div>
+
+                    <button onclick="skipQuestion()" class="btn bg-gray-100 text-gray-600 font-bold py-3 px-6 rounded-lg hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-400 transition-all">
+                        跳过
+                    </button>
+                </div>
+
+                <div class="mt-12 text-center text-gray-500 text-sm">
+                    <p><i class="fas fa-lightbulb mr-2"></i>提示：选择最符合你真实游戏行为的选项，不要过度思考</p>
+                </div>
+            </div>
+        `;
+    }
+
+    function renderResult() {
+        if (!result) {
+            calculateResult();
+        }
+
+        const personality = personalities.find(p => p.id === result.personalityId) || personalities[0];
+
+        app.innerHTML = `
+            <div class="fade-in max-w-4xl mx-auto">
+                <div class="text-center mb-12">
+                    <h1 class="text-4xl font-bold text-gray-800 mb-4">测试完成！</h1>
+                    <p class="text-xl text-gray-600">你的狼人杀人格是</p>
+                </div>
+
+                <div class="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-2xl shadow-xl p-8 mb-8 border border-blue-100">
+                    <div class="flex flex-col md:flex-row items-center">
+                        <div class="md:w-1/3 text-center mb-8 md:mb-0">
+                            <div class="inline-block p-6 bg-white rounded-full shadow-lg">
+                                <i class="fas fa-crown text-6xl text-yellow-500"></i>
+                            </div>
+                            <div class="mt-6">
+                                <div class="text-5xl font-bold text-blue-600 mb-2">${result.score}</div>
+                                <div class="text-gray-600">匹配度评分</div>
+                            </div>
+                        </div>
+                        <div class="md:w-2/3 md:pl-12">
+                            <h2 class="text-3xl font-bold text-gray-800 mb-4">${personality.name}</h2>
+                            <p class="text-gray-700 text-lg mb-6">${personality.description}</p>
+                            <div class="mb-6">
+                                <h3 class="text-lg font-bold text-gray-800 mb-3">核心维度标签：</h3>
+                                <div class="flex flex-wrap">
+                                    ${result.topDimensions.map(dim => {
+                                        const dimInfo = dimensions.find(d => d.key === dim.key);
+                                        const label = dimInfo ? dimInfo.labels[dim.value - 1] : dim.key;
+                                        return `<span class="result-badge bg-blue-100 text-blue-800">${label}</span>`;
+                                    }).join('')}
+                                </div>
+                            </div>
+                            <div class="bg-white p-5 rounded-xl">
+                                <h3 class="text-lg font-bold text-gray-800 mb-3">维度分析：</h3>
+                                <div class="space-y-4">
+                                    ${result.dimensionScores.map((score, idx) => {
+                                        const dim = dimensions[idx];
+                                        const label = score.avg !== null ? dim.labels[Math.floor(score.avg) - 1] : '未测量';
+                                        const width = score.avg !== null ? ((score.avg - 1) / 2) * 100 : 0;
+                                        return `
+                                            <div>
+                                                <div class="flex justify-between mb-1">
+                                                    <span class="font-medium text-gray-700">${dim.labels[0]} ↔ ${dim.labels[2]}</span>
+                                                    <span class="font-bold ${score.avg !== null ? 'text-blue-600' : 'text-gray-400'}">${score.avg !== null ? score.avg.toFixed(1) : 'N/A'}</span>
+                                                </div>
+                                                <div class="progress-bar bg-gray-200">
+                                                    ${score.avg !== null ? `<div class="progress-fill bg-gradient-to-r from-blue-400 to-indigo-500" style="width: ${width}%"></div>` : ''}
+                                                </div>
+                                            </div>
+                                        `;
+                                    }).join('')}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
+                    <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
+                        <h3 class="text-xl font-bold text-gray-800 mb-4">分享结果</h3>
+                        <p class="text-gray-600 mb-4">${frontendText.shareText.replace('【XXX】', personality.name)}</p>
+                        <div class="flex space-x-4">
+                            <button onclick="shareResult('wechat')" class="btn bg-green-500 text-white py-3 px-6 rounded-lg hover:bg-green-600 flex-grow">
+                                <i class="fab fa-weixin mr-2"></i>微信分享
+                            </button>
+                            <button onclick="shareResult('weibo')" class="btn bg-red-500 text-white py-3 px-6 rounded-lg hover:bg-red-600 flex-grow">
+                                <i class="fab fa-weibo mr-2"></i>微博分享
+                            </button>
+                        </div>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
+                        <h3 class="text-xl font-bold text-gray-800 mb-4">重新测试</h3>
+                        <p class="text-gray-600 mb-4">想看看不同的选择会带来什么结果吗？重新测试看看！</p>
+                        <button onclick="restartTest()" class="btn bg-gradient-to-r from-purple-500 to-pink-600 text-white py-3 px-8 rounded-lg hover:from-purple-600 hover:to-pink-700 w-full">
+                            <i class="fas fa-redo mr-2"></i>${frontendText.buttons.retry}
+                        </button>
+                    </div>
+                </div>
+
+                <div class="text-center">
+                    <button onclick="goHome()" class="btn bg-gray-200 text-gray-800 font-bold py-3 px-8 rounded-lg hover:bg-gray-300 mr-4">
+                        <i class="fas fa-home mr-2"></i>返回首页
+                    </button>
+                    <button onclick="viewAllPersonalities()" class="btn bg-gradient-to-r from-blue-500 to-indigo-600 text-white font-bold py-3 px-8 rounded-lg hover:from-blue-600 hover:to-indigo-700">
+                        <i class="fas fa-list mr-2"></i>查看全部30种人格
+                    </button>
+                </div>
+            </div>
+        `;
+    }
+
+    // Calculation functions
+    function calculateResult() {
+        // Initialize dimension accumulators
+        const dimSums = Array(dimensionKeys.length).fill(0);
+        const dimCounts = Array(dimensionKeys.length).fill(0);
+
+        // Sum scores from answers
+        answers.forEach(answer => {
+            const question = questions.find(q => q.id === answer.questionId);
+            if (!question) return;
+
+            const option = question.options[answer.optionIndex];
+            if (!option) return;
+
+            option.scores.forEach((score, idx) => {
+                if (score !== null) {
+                    dimSums[idx] += score;
+                    dimCounts[idx] += 1;
+                }
+            });
+        });
+
+        // Calculate averages
+        const dimensionAverages = dimSums.map((sum, idx) => {
+            const count = dimCounts[idx];
+            return count > 0 ? sum / count : null;
+        });
+
+        // Create dimension score objects
+        const dimensionScores = dimensionAverages.map((avg, idx) => ({
+            key: dimensionKeys[idx],
+            avg: avg,
+            label: avg !== null ? getDimensionLabel(idx, avg) : null
+        }));
+
+        // Find top 2 dimensions with highest averages
+        const scoredDimensions = dimensionScores
+            .map((score, idx) => ({ ...score, index: idx }))
+            .filter(score => score.avg !== null)
+            .sort((a, b) => b.avg - a.avg);
+
+        const topDimensions = scoredDimensions.slice(0, 2).map(score => ({
+            key: score.key,
+            value: Math.round(score.avg), // 1, 2, or 3
+            label: score.label
+        }));
+
+        // Find matching personality
+        const personalityId = findMatchingPersonality(topDimensions, dimensionScores);
+
+        // Calculate overall match score (0-100)
+        const score = Math.round((answers.length / questions.length) * 100);
+
+        result = {
+            dimensionScores,
+            topDimensions,
+            personalityId,
+            score
+        };
+    }
+
+    function getDimensionLabel(dimIndex, avg) {
+        const dim = dimensions[dimIndex];
+        if (!dim) return '';
+
+        if (avg >= 1.0 && avg <= 1.6) return dim.labels[0]; // 偏左
+        if (avg >= 1.7 && avg <= 2.3) return dim.labels[1]; // 平衡
+        if (avg >= 2.4 && avg <= 3.0) return dim.labels[2]; // 偏右
+        return dim.labels[1]; // default
+    }
+
+    function findMatchingPersonality(topDimensions, dimensionScores) {
+        // Simple matching: find personality whose description contains both dimension labels
+        const dimLabels = topDimensions.map(d => d.label);
+
+        for (const personality of personalities) {
+            const desc = personality.description.toLowerCase();
+            // Check if description contains both labels
+            const containsAll = dimLabels.every(label =>
+                desc.includes(label.toLowerCase())
+            );
+            if (containsAll) {
+                return personality.id;
+            }
+        }
+
+        // Fallback: find personality with at least one matching label
+        for (const personality of personalities) {
+            const desc = personality.description.toLowerCase();
+            const containsAny = dimLabels.some(label =>
+                desc.includes(label.toLowerCase())
+            );
+            if (containsAny) {
+                return personality.id;
+            }
+        }
+
+        // Default to first personality
+        return 1;
+    }
+
+    // Navigation functions (exposed to global scope)
+    window.startTest = function() {
+        currentView = 'test';
+        currentQuestionIndex = 0;
+        answers = [];
+        render();
+    };
+
+    window.goHome = function() {
+        currentView = 'home';
+        render();
+    };
+
+    window.selectOption = function(optionIndex) {
+        const question = questions[currentQuestionIndex];
+        const existingAnswerIndex = answers.findIndex(a => a.questionId === question.id);
+
+        if (existingAnswerIndex >= 0) {
+            answers[existingAnswerIndex].optionIndex = optionIndex;
+            answers[existingAnswerIndex].scores = question.options[optionIndex].scores;
+        } else {
+            answers.push({
+                questionId: question.id,
+                optionIndex: optionIndex,
+                scores: question.options[optionIndex].scores
+            });
+        }
+
+        render();
+    };
+
+    window.nextQuestion = function() {
+        if (currentQuestionIndex < questions.length - 1) {
+            currentQuestionIndex++;
+            render();
+        } else {
+            // Last question, show result
+            currentView = 'result';
+            render();
+        }
+    };
+
+    window.prevQuestion = function() {
+        if (currentQuestionIndex > 0) {
+            currentQuestionIndex--;
+            render();
+        }
+    };
+
+    window.skipQuestion = function() {
+        // Move to next question without answering
+        if (currentQuestionIndex < questions.length - 1) {
+            currentQuestionIndex++;
+            render();
+        } else {
+            currentView = 'result';
+            render();
+        }
+    };
+
+    window.restartTest = function() {
+        currentView = 'test';
+        currentQuestionIndex = 0;
+        answers = [];
+        result = null;
+        render();
+    };
+
+    window.shareResult = function(platform) {
+        alert(`分享到${platform}功能需要集成社交媒体SDK。\n\n你的结果：${result ? personalities.find(p => p.id === result.personalityId).name : ''}`);
+    };
+
+    window.viewAllPersonalities = function() {
+        alert('显示全部30种人格功能尚未实现。');
+    };
+
+    // Initial render
+    render();
+});

@@ -1,0 +1,256 @@
+const questions = [
+  {
+    id: 1,
+    text: `你是预言家，金水反水还头铁硬刚，你会？`,
+    options: [
+      { letter: "A", text: `破防吐槽`, scores: [null, 1, 3, 1, 1, 3] },
+      { letter: "B", text: `耐心盘逻辑`, scores: [null, null, null, null, null, null] },
+      { letter: "C", text: `摆烂`, scores: [null, null, null, null, null, null] },
+    ]
+  },
+  {
+    id: 2,
+    text: `女巫把猎人泼崩好人，你会？`,
+    options: [
+      { letter: "A", text: `当场开喷`, scores: [null, 1, 1, 1, 1, 3] },
+      { letter: "B", text: `安慰救场`, scores: [null, null, null, null, null, null] },
+      { letter: "C", text: `内心吐槽`, scores: [null, null, null, null, null, null] },
+      { letter: "D", text: `搞事情`, scores: [null, null, null, null, null, null] },
+    ]
+  },
+  {
+    id: 3,
+    text: `有人摆烂划麦不投票，你会？`,
+    options: [
+      { letter: "A", text: `点名Diss`, scores: [null, 1, 1, 1, 1, 3] },
+      { letter: "B", text: `卑微引导`, scores: [null, null, null, null, null, null] },
+      { letter: "C", text: `事不关己`, scores: [null, null, null, null, null, null] },
+      { letter: "D", text: `标狼抗推`, scores: [null, null, null, null, null, null] },
+    ]
+  },
+  {
+    id: 4,
+    text: `被全场当狼打，你会？`,
+    options: [
+      { letter: "A", text: `破防反驳`, scores: [null, 1, 3, 1, 1, 3] },
+      { letter: "B", text: `冷静解释`, scores: [null, null, null, null, null, null] },
+      { letter: "C", text: `摆烂认狼`, scores: [null, null, null, null, null, null] },
+    ]
+  },
+  {
+    id: 5,
+    text: `发牌时你最想拿？`,
+    options: [
+      { letter: "A", text: `预言家/通灵`, scores: [null, 1, 1, 1, 1, 1] },
+      { letter: "B", text: `狼/狼枪`, scores: [null, null, null, null, null, null] },
+      { letter: "C", text: `巫/猎`, scores: [null, null, null, null, null, null] },
+      { letter: "D", text: `平民`, scores: [null, null, null, null, null, null] },
+    ]
+  },
+  {
+    id: 6,
+    text: `好人你更想拿？`,
+    options: [
+      { letter: "A", text: `验人系`, scores: [null, 1, 1, 1, 1, 1] },
+      { letter: "B", text: `强势系`, scores: [null, null, null, null, null, null] },
+      { letter: "C", text: `守卫`, scores: [null, null, null, null, null, null] },
+      { letter: "D", text: `只想当民`, scores: [null, null, null, null, null, null] },
+    ]
+  },
+  {
+    id: 7,
+    text: `机械狼你最想学？`,
+    options: [
+      { letter: "A", text: `狼枪奶奶`, scores: [null, 1, 3, 3, 3, 3] },
+      { letter: "B", text: `机械守卫`, scores: [null, null, null, null, null, null] },
+      { letter: "C", text: `双刀`, scores: [null, null, null, null, null, null] },
+      { letter: "D", text: `机械巫`, scores: [null, null, null, null, null, null] },
+      { letter: "E", text: `机械平民`, scores: [null, null, null, null, null, null] },
+      { letter: "F", text: `无机械大眼睛`, scores: [null, null, null, null, null, null] },
+    ]
+  },
+  {
+    id: 8,
+    text: `拿到平民你会？`,
+    options: [
+      { letter: "A", text: `假装神职挡刀`, scores: [null, 1, 3, 1, 1, 3] },
+      { letter: "B", text: `低调苟住`, scores: [null, null, null, null, null, null] },
+      { letter: "C", text: `摆烂划水`, scores: [null, null, null, null, null, null] },
+      { letter: "D", text: `乱搞心态`, scores: [null, null, null, null, null, null] },
+    ]
+  },
+  {
+    id: 9,
+    text: `队友焊跳，你会？`,
+    options: [
+      { letter: "A", text: `猛猛冲锋`, scores: [null, 1, 3, 1, 3, 3] },
+      { letter: "B", text: `倒钩卖队友`, scores: [null, null, null, null, null, null] },
+      { letter: "C", text: `中立划水`, scores: [null, null, null, null, null, null] },
+      { letter: "D", text: `再跳一个预言家`, scores: [null, null, null, null, null, null] },
+    ]
+  },
+  {
+    id: 10,
+    text: `狼队劣势只剩两人，你会？`,
+    options: [
+      { letter: "A", text: `强行焊跳`, scores: [null, 1, 3, 1, 3, 3] },
+      { letter: "B", text: `卖队友保自己`, scores: [null, null, null, null, null, null] },
+      { letter: "C", text: `自曝`, scores: [null, null, null, null, null, null] },
+      { letter: "D", text: `装晕狼`, scores: [null, null, null, null, null, null] },
+    ]
+  },
+  {
+    id: 11,
+    text: `首夜狼队战术你建议？`,
+    options: [
+      { letter: "A", text: `自刀骗药`, scores: [null, 1, 3, 3, 3, 3] },
+      { letter: "B", text: `刀女巫`, scores: [null, null, null, null, null, null] },
+      { letter: "C", text: `躺平听指挥`, scores: [null, null, null, null, null, null] },
+    ]
+  },
+  {
+    id: 12,
+    text: `狼要被抗推，你会？`,
+    options: [
+      { letter: "A", text: `甩锅垫飞`, scores: [null, 1, 3, 1, 3, 3] },
+      { letter: "B", text: `装新手`, scores: [null, null, null, null, null, null] },
+      { letter: "C", text: `认狼误导`, scores: [null, null, null, null, null, null] },
+      { letter: "D", text: `摆烂自曝`, scores: [null, null, null, null, null, null] },
+    ]
+  },
+  {
+    id: 13,
+    text: `狼枪胶着局怎么玩？`,
+    options: [
+      { letter: "A", text: `自刀焊跳`, scores: [null, 1, 3, 1, 3, 3] },
+      { letter: "B", text: `冲锋送命`, scores: [null, null, null, null, null, null] },
+      { letter: "C", text: `潜伏开枪`, scores: [null, null, null, null, null, null] },
+      { letter: "D", text: `随缘摆烂`, scores: [null, null, null, null, null, null] },
+    ]
+  },
+  {
+    id: 14,
+    text: `女巫首夜吃刀，你会？`,
+    options: [
+      { letter: "A", text: `保守压毒`, scores: [null, 1, 1, 3, 1, 1] },
+      { letter: "B", text: `疯批赌毒`, scores: [null, null, null, null, null, null] },
+    ]
+  },
+  {
+    id: 15,
+    text: `对跳女巫，你是真女巫？`,
+    options: [
+      { letter: "A", text: `毒对跳`, scores: [null, 1, 3, 1, 1, 3] },
+      { letter: "B", text: `毒外置位`, scores: [null, null, null, null, null, null] },
+      { letter: "C", text: `压毒观望`, scores: [null, null, null, null, null, null] },
+      { letter: "D", text: `喊好人投票`, scores: [null, null, null, null, null, null] },
+    ]
+  },
+  {
+    id: 16,
+    text: `猎人前期怎么玩？`,
+    options: [
+      { letter: "A", text: `强势跳明`, scores: [null, 1, 3, 1, 1, 1] },
+      { letter: "B", text: `装民深推`, scores: [null, null, null, null, null, null] },
+      { letter: "C", text: `滴滴代跳`, scores: [null, null, null, null, null, null] },
+      { letter: "D", text: `中立划水`, scores: [null, null, null, null, null, null] },
+    ]
+  },
+  {
+    id: 17,
+    text: `平民遇狼队强势，你会？`,
+    options: [
+      { letter: "A", text: `主动挡刀`, scores: [null, 1, 3, 1, 1, 3] },
+      { letter: "B", text: `低调站队`, scores: [null, null, null, null, null, null] },
+      { letter: "C", text: `摆烂`, scores: [null, null, null, null, null, null] },
+      { letter: "D", text: `乱搞搅局`, scores: [null, null, null, null, null, null] },
+    ]
+  },
+  {
+    id: 18,
+    text: `双预对跳分不清，你会？`,
+    options: [
+      { letter: "A", text: `观望`, scores: [null, 1, 1, 3, 1, 1] },
+      { letter: "B", text: `随缘站边`, scores: [null, null, null, null, null, null] },
+      { letter: "C", text: `安排PK`, scores: [null, null, null, null, null, null] },
+      { letter: "D", text: `钓鱼执法`, scores: [null, null, null, null, null, null] },
+    ]
+  },
+  {
+    id: 19,
+    text: `好人输了复盘，你会？`,
+    options: [
+      { letter: "A", text: `理性总结`, scores: [null, 1, 1, 1, 1, 1] },
+      { letter: "B", text: `吐槽队友`, scores: [null, null, null, null, null, null] },
+      { letter: "C", text: `佛系无所谓`, scores: [null, null, null, null, null, null] },
+      { letter: "D", text: `偷师狼队`, scores: [null, null, null, null, null, null] },
+    ]
+  },
+];
+
+
+
+
+
+const personalities = [
+  { id: 1, name: `铁血逻辑预言家`, description: `正派+逻辑+稳定 逻辑天花板，好人唯一真神` },
+  { id: 2, name: `冲锋狼王`, description: `激进+心机+整活 狼队灵魂，敢冲敢焊跳` },
+  { id: 3, name: `正义直球猎人`, description: `激进+正派+稳定 脾气爆正义感强，出局必带狼` },
+  { id: 4, name: `稳健守序女巫`, description: `保守+逻辑+稳定 不毒错人，好人最稳后盾` },
+  { id: 5, name: `温柔靠谱守卫`, description: `保守+认真+稳定 默默守护，安全感拉满` },
+  { id: 6, name: `清醒闭眼民`, description: `逻辑+正派+稳定 闭眼也能站对边，平民之光` },
+  { id: 7, name: `理性复盘大师`, description: `认真+逻辑+稳定 输赢都复盘，越玩越强` },
+  { id: 8, name: `疯批快乐女巫`, description: `激进+整活+人性 输赢无所谓，赌毒最快乐` },
+  { id: 9, name: `整活代跳猎人`, description: `激进+整活+带队 戏精附体，滴滴代跳挡刀` },
+  { id: 10, name: `热血挡刀平民`, description: `激进+正派+整活 为神职挡刀，义不容辞` },
+  { id: 11, name: `嘴强正义好人`, description: `激进+人性+整活 嘴比逻辑快，热心但易破防` },
+  { id: 12, name: `气氛组好人`, description: `佛系+人性+整活 不吵架不分析，主打快乐` },
+  { id: 13, name: `随缘摆烂民`, description: `佛系+躺平+稳定 不发言不投票，活着就行` },
+  { id: 14, name: `看戏路人甲`, description: `佛系+躺平+人性 全程吃瓜，输赢与我无关` },
+  { id: 15, name: `Peace划水民`, description: `佛系+稳定+正派 不惹事不站队，平安最大` },
+  { id: 16, name: `躺赢混子`, description: `躺平+佛系+稳定 跟着大佬混，躺赢最香` },
+  { id: 17, name: `深水倒钩狼`, description: `保守+心机+稳定 藏到决赛圈，好人一辈子不信` },
+  { id: 18, name: `战术机械平民`, description: `保守+心机+稳定 被验即金水，躺赢之王` },
+  { id: 19, name: `隐忍机械守卫`, description: `保守+逻辑+心机 偷盾保命，稳到最后` },
+  { id: 20, name: `冷静倒钩大师`, description: `逻辑+心机+稳定 盘逻辑倒钩，没人怀疑` },
+  { id: 21, name: `疯批机械巫`, description: `激进+心机+整活 偷毒乱杀，骗全场团团转` },
+  { id: 22, name: `双刀整活狼`, description: `激进+心机+整活 刀人不手软，刺激就完了` },
+  { id: 23, name: `垫飞战术大师`, description: `人性+心机+整活 拉人垫飞，卖队友保自己` },
+  { id: 24, name: `演技派倒钩`, description: `人性+心机+稳定 伪装好人，影帝级别` },
+  { id: 25, name: `狼枪奶奶本奶`, description: `激进+整活+心机 出局必开枪，拉垫背超爽` },
+  { id: 26, name: `搅局心机狼`, description: `整活+心机+人性 乱发言搅混水，好人晕头转向` },
+  { id: 27, name: `低调深水狼`, description: `保守+躺平+心机 不发言不做事，苟到赢` },
+  { id: 28, name: `逻辑流倒钩`, description: `逻辑+心机+稳定 用逻辑骗好人，高端玩家` },
+  { id: 29, name: `人性流冲锋`, description: `人性+心机+带队 煽动全场，拉票一把手` },
+  { id: 30, name: `全能六边形玩家`, description: `全维度平衡 可狼可神可民，胜率天花板` },
+];
+
+const dimensions = [
+  { key: 'play_style', labels: ['激进', '平衡', '保守'] },
+  { key: 'game_attitude', labels: ['认真', '平衡', '佛系'] },
+  { key: 'think_way', labels: ['逻辑流', '平衡', '人性流'] },
+  { key: 'social_role', labels: ['带队', '平衡', '躺平'] },
+  { key: 'moral_type', labels: ['正派', '平衡', '心机'] },
+  { key: 'operate_style', labels: ['稳定', '平衡', '整活'] }
+];
+
+const dimensionKeys = ['play_style', 'game_attitude', 'think_way', 'social_role', 'moral_type', 'operate_style'];
+
+// Scoring rules
+const scoringRules = {
+  lowRange: [1.0, 1.6],    // 偏左
+  midRange: [1.7, 2.3],    // 平衡
+  highRange: [2.4, 3.0]    // 偏右
+};
+
+// Frontend text
+const frontendText = {
+  title: "测测你是狼人杀里的哪种人格？",
+  subtitle: "别装！按真实玩法选，超准！",
+  shareText: "我是【XXX】，快来测测你是谁！",
+  buttons: {
+    start: "开始测试",
+    seeResult: "查看结果",
+    retry: "再测一次"
+  }
+};
